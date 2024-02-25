@@ -26,7 +26,10 @@ namespace TesteBackendEnContact.Repository
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
             var dao = new ContactBookDao(contactBook);
 
-            dao.Id = await connection.InsertAsync(dao);
+            if (dao.Id == 0)
+                dao.Id = await connection.InsertAsync(dao);
+            else
+                await connection.UpdateAsync(dao);
 
             return dao.Export();
         }
@@ -37,7 +40,11 @@ namespace TesteBackendEnContact.Repository
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             // TODO
-            var sql = "";
+            var sql = new StringBuilder();
+            sql.AppendLine("DELETE FROM ContactBook WHERE Id = @id;");
+            sql.AppendLine("UPDATE Contact SET ContactBookId = null WHERE ContactBookId = @id;");
+            sql.AppendLine("UPDATE Company SET ContactBookId = null WHERE ContactBookId = @id;");
+
 
             await connection.ExecuteAsync(sql);
         }
@@ -52,21 +59,18 @@ namespace TesteBackendEnContact.Repository
             var query = "SELECT * FROM ContactBook";
             var result = await connection.QueryAsync<ContactBookDao>(query);
 
-            var returnList = new List<IContactBook>();
+            return result?.Select(item => item.Export());
 
-            foreach (var AgendaSalva in result.ToList())
-            {
-                IContactBook Agenda = new ContactBook(AgendaSalva.Id, AgendaSalva.Name.ToString());
-                returnList.Add(Agenda);
-            }
 
-            return returnList.ToList();
         }
-        public async Task<IContactBook> GetAsync(int id)
+        public async Task<ICompany> GetAsync(int id)
         {
-            var list = await GetAllAsync();
+            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
-            return list.ToList().Where(item => item.Id == id).FirstOrDefault();
+            var query = "SELECT * FROM ContactBook where Id = @id";
+            var result = await connection.QuerySingleOrDefaultAsync<ContactBookDao>(query, new { id });
+
+            return result?.Export();
         }
     }
 

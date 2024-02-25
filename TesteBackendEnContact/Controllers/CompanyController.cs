@@ -20,9 +20,13 @@ namespace TesteBackendEnContact.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ICompany>> Post(SaveCompanyRequest company, [FromServices] ICompanyRepository companyRepository)
+        public async Task<ActionResult<ICompany>> Post(SaveCompanyRequest request, [FromServices] ICompanyRepository companyRepository)
         {
-            return Ok(await companyRepository.SaveAsync(company.ToCompany()));
+            var company = await companyRepository.SaveAsync(request.ToCompany());
+            // _logger.LogInformation("Company saved: {company}", company);
+
+            return request.id == 0 ? Created(company) : Ok(company);
+
         }
 
         [HttpDelete]

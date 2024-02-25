@@ -20,9 +20,12 @@ namespace TesteBackendEnContact.Controllers
         }
 
         [HttpPost]
-        public async Task<IContactBook> Post(ContactBook contactBook, [FromServices] IContactBookRepository contactBookRepository)
+        public async Task<IContactBook> Post(SaveContactBookRequest request, [FromServices] IContactBookRepository contactBookRepository)
         {
-            return await contactBookRepository.SaveAsync(contactBook);
+            var contactBook = await contactBookRepository.SaveAsync(request);
+            // _logger.Logging("ContactBook saved: {contactBook}", contactBook);
+
+            return request.id == 0 ? Created(contactBook) : Ok(contactBook);
         }
 
         [HttpDelete]
