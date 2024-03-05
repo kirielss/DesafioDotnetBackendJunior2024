@@ -2,7 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\TesteBackendEnContact",
-    "\\TesteBackendEnContact\\Controllers"
+    "\\TesteBackendEnContact\\Controllers",
+    "\\TesteBackendEnContact\\Properties",
+    "\\TesteBackendEnContact\\Repository"
   ],
   "SelectedNode": "\\TesteBackendEnContact\\Program.cs",
   "PreviewInSolutionExplorer": false
